@@ -1,13 +1,22 @@
+from error_handler import ErrorHandler
+from scanner import Scanner
 import sys
 
 
 class Main:
 
     def __init__(self):
-        self.had_error = False
+        self.error_handler = ErrorHandler()
 
-    def open_file(self, file_name):
-        print(True)
+    def run_file(self, file_name):
+
+        with open(file_name, 'r') as file:
+            file_string = file.read()
+
+        self.run_code(file_string)
+
+        if self.error_handler.had_error:
+            sys.exit(65)
 
     def run_prompt(self):
 
@@ -15,20 +24,28 @@ class Main:
 
             print('>>> ', end='')
             line = input()
-            self.run_code(line)
 
             if not line:
                 break
 
-    def run_code(self, line):
-        print(True)
+            self.run_code(line)
+            self.error_handler.had_error = False
+
+    def run_code(self, source):
+
+        scanner = Scanner(self.error_handler, source)
+        tokens = scanner.scan_tokens()
+
+        if self.error_handler.had_error:
+            return
 
     def run_lox(self):
 
         if len(sys.argv) > 2:
-            print('Error!')
+            print('Usage: lox.py [file_name]')
+            sys.exit(64)
         elif len(sys.argv) == 2:
-            self.open_file(sys.argv[1])
+            self.run_file(sys.argv[1])
         else:
             self.run_prompt()
 
