@@ -1,96 +1,88 @@
+from error_handler import ErrorHandler
 from token_type import *
 from token import Token
 
 
 class Scanner:
 
-    def __init__(self, source, tokens: Token):
+    def __init__(self, error_handler: ErrorHandler, source):
+
+        self.source = source
+        self.error_handler = error_handler
+        self.tokens = []
+
         self.start = 0
         self.current = 0
         self.line = 1
-        self.source = source
-        self.tokens = tokens
 
     def scan_tokens(self):
 
-        while self.is_at_end():
+        while not self.is_at_end():
             self.start = self.current
             self.scan_token()
 
-        self.tokens.__init__(TokenType.EOF, '', None, self.line)
+        self.tokens.append(Token(TokenType.EOF, "", None, self.line))
         return self.tokens
 
     def scan_token(self):
 
-        c = self.advance()
+        char = self.advance()
 
-        if c == '(':
+        if char == '(':
             self.add_token(TokenType.LEFT_PAREN)
-        elif c == ')':
+        elif char == ')':
             self.add_token(TokenType.RIGHT_PAREN)
-        elif c == '{':
+        elif char == '{':
             self.add_token(TokenType.LEFT_BRACE)
-        elif c == '}':
+        elif char == '}':
             self.add_token(TokenType.RIGHT_BRACE)
-        elif c == ',':
+        elif char == ',':
             self.add_token(TokenType.COMMA)
-        elif c == '.':
+        elif char == '.':
             self.add_token(TokenType.DOT)
-        elif c == '-':
+        elif char == '-':
             self.add_token(TokenType.MINUS)
-        elif c == '+':
+        elif char == '+':
             self.add_token(TokenType.PLUS)
-        elif c == ';':
+        elif char == ';':
             self.add_token(TokenType.SEMICOLON)
-        elif c == '*':
+        elif char == '*':
             self.add_token(TokenType.STAR)
-        elif c == '!':
-            if self.match('='):
-                self.add_token(TokenType.BANG_EQUAL)
-            else:
-                self.add_token(TokenType.BANG)
-        elif c == '=':
-            if self.match('='):
-                self.add_token(TokenType.EQUAL_EQUAL)
-            else:
-                self.add_token(TokenType.EQUAL)
-        elif c == '<':
-            if self.match('='):
-                self.add_token(TokenType.LESS_EQUAL)
-            else:
-                self.add_token(TokenType.LESS)
-        elif c == '>':
-            if self.match('='):
-                self.add_token(TokenType.GREATER_EQUAL)
-            else:
-                self.add_token(TokenType.GREATER)
-        elif c == '/':
+        elif char == '!':
+            self.add_token(TokenType.BANG_EQUAL if self.match('=') else TokenType.BANG)
+        elif char == '=':
+            self.add_token(TokenType.EQUAL_EQUAL if self.match('=') else TokenType.EQUAL)
+        elif char == '<':
+            self.add_token(TokenType.LESS_EQUAL if self.match('=') else TokenType.LESS)
+        elif char == '>':
+            self.add_token(TokenType.GREATER_EQUAL if self.match('=') else TokenType.GREATER)
+        elif char == '/':
             if self.match('/'):
                 while self.peek() != '\n' and not self.is_at_end():
                     self.advance()
             else:
                 self.add_token(TokenType.SLASH)
-        elif c == ' ' or c == '\r' or c == '\t':
+        elif char == ' ' or char == '\r' or char == '\t':
             pass
-        elif c == '\n':
+        elif char == '\n':
             self.line += 1
-        elif c == '"':
+        elif char == '"':
             self.string()
         else:
-            if self.is_digit(c):
+            if self.is_digit(char):
                 self.number()
             else:
-                print(str(self.line) + 'Unexpected character!' + str(c))
+                self.error_handler.error(self.line, 'Unexpected character.')
 
     def is_at_end(self):
 
         if self.current >= len(self.source):
-            return False
+            return True
 
     def advance(self):
 
         self.current += 1
-        return self.source[self.current + 1:]
+        return self.source[self.current - 1]
 
     def match(self, expected):
 
@@ -115,20 +107,20 @@ class Scanner:
         while self.peek() != '"' and not self.is_at_end():
             if self.peek() == '\n':
                 self.line += 1
-                self.advance()
+            self.advance()
 
         if self.is_at_end():
-            print(str(self.line) + 'Unexpected character!' + self.peek())
+            self.error_handler.error(self.line, "Unterminated String.")
             return
 
         self.advance()
-        string_value = self.source[self.start + 1 : self.current - 1]
+        string_value = self.source[self.start + 1: self.current - 1]
         self.add_token(TokenType.STRING, string_value)
 
-    @static
-    def is_digit(self, c):
+    @staticmethod
+    def is_digit(char):
 
-        return '0' <= c <= '9'
+        return '0' <= char <= '9'
 
     def number(self):
 
@@ -141,7 +133,7 @@ class Scanner:
             while self.is_digit(self.peek()):
                 self.advance()
 
-        self.add_token(TokenType.NUMBER, float(self.source[self.start, self.current]))
+        self.add_token(TokenType.NUMBER, float(self.source[self.start: self.current]))
 
     def peek_next(self):
 
@@ -150,10 +142,7 @@ class Scanner:
 
         return self.source[self.current + 1]
 
-    def add_token(self, token_type: TokenType):
-        self.add_token(token_type, None)
+    def add_token(self, token_type: TokenType, literal=None):
 
-    def add_token(self, token_type: TokenType, literal):
-
-        text = self.source[self.start : self.current]
-        self.tokens.__init__(TokenType.EOF, text, literal, self.line)
+        text = self.source[self.start: self.current]
+        self.tokens.append(Token(token_type, text, literal, self.line))
