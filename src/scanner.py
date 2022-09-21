@@ -9,11 +9,28 @@ class Scanner:
 
         self.source = source
         self.error_handler = error_handler
-        self.tokens = []
+        self.tokens = list()
 
         self.start = 0
         self.current = 0
         self.line = 1
+
+        self.keywords = {'and': TokenType.AND,
+                         'class': TokenType.CLASS,
+                         'else': TokenType.ELSE,
+                         'false': TokenType.FALSE,
+                         'for': TokenType.FOR,
+                         'fun': TokenType.FUN,
+                         'if': TokenType.IF,
+                         'nil': TokenType.NIL,
+                         'or': TokenType.OR,
+                         'print': TokenType.PRINT,
+                         'return': TokenType.RETURN,
+                         'super': TokenType.SUPER,
+                         'this': TokenType.THIS,
+                         'true': TokenType.TRUE,
+                         'var': TokenType.VAR,
+                         'while': TokenType.WHILE}
 
     def scan_tokens(self):
 
@@ -71,13 +88,13 @@ class Scanner:
         else:
             if self.is_digit(char):
                 self.number()
+            elif self.is_alpha(char):
+                self.identifier()
             else:
                 self.error_handler.error(self.line, 'Unexpected character.')
 
     def is_at_end(self):
-
-        if self.current >= len(self.source):
-            return True
+        return self.current >= len(self.source)
 
     def advance(self):
 
@@ -119,8 +136,27 @@ class Scanner:
 
     @staticmethod
     def is_digit(char):
-
         return '0' <= char <= '9'
+
+    @staticmethod
+    def is_alpha(char):
+        return ('a' <= char <= 'z') or ('A' <= char <= 'Z') or char == '_'
+
+    def is_alpha_numeric(self, char):
+        return self.is_alpha(char) or self.is_digit(char)
+
+    def identifier(self):
+
+        while self.is_alpha_numeric(self.peek()):
+            self.advance()
+
+        text = self.source[self.start : self.current]
+        t = TokenType.IDENTIFIER
+
+        if text in self.keywords:
+            t = self.keywords[text]
+
+        self.add_token(t)
 
     def number(self):
 
