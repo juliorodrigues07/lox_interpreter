@@ -77,6 +77,8 @@ class Scanner:
             if self.match('/'):
                 while self.peek() != '\n' and not self.is_at_end():
                     self.advance()
+            elif self.match('*'):
+                self.skip()
             else:
                 self.add_token(TokenType.SLASH)
         elif char == ' ' or char == '\r' or char == '\t':
@@ -158,6 +160,23 @@ class Scanner:
 
         self.add_token(t)
 
+    def skip(self):
+
+        while True:
+
+            if self.is_at_end():
+                break
+
+            if self.peek() == '*' and self.peek_next() == '/':
+                self.advance()
+                self.advance()
+                break
+
+            if self.peek() == '\n':
+                self.line += 1
+
+            self.advance()
+
     def number(self):
 
         while self.is_digit(self.peek()):
@@ -182,3 +201,4 @@ class Scanner:
 
         text = self.source[self.start: self.current]
         self.tokens.append(Token(token_type, text, literal, self.line))
+        
