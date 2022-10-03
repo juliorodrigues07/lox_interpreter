@@ -1,5 +1,7 @@
 import sys
+import os
 
+os.chdir('..')
 
 class GenerateAST:
     def __init__(self):
@@ -9,10 +11,10 @@ class GenerateAST:
 
     def defineType(self, arquivo, basename, classname, fieldlist):
         arquivo.writelines(u'class ' + classname + '(Expr):\n')
-        arquivo.writelines(u'\tdef __init__' + '(self, ')
+        arquivo.writelines(u'\tdef __init__' + '(self')
         for nome in fieldlist:
             separado = nome.split(' ')
-            arquivo.writelines(separado[1] + ', ')
+            arquivo.writelines(', ' + separado[1])
         arquivo.writelines(u')' + ':\n')
         for nome in fieldlist:
             separado = nome.split(' ')
@@ -43,5 +45,6 @@ if __name__ == '__main__':
     a = {"Binary": ['Expr left', 'Token operator', 'Expr right'], "Grouping": ['Expr expression'],
          "Literal": ["object value"],
          "Unary": ['Token operator', 'Expr right']}
-    b = r'C:\Users\pvict\PycharmProjects\lox_interpreter\src\\'
+    b = str(os.getcwd() + '/src')
+
     GenerateAST().defineAst(b, 'Expr', a)
