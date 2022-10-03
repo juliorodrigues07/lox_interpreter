@@ -1,7 +1,7 @@
-from src import Expr
-from src.token_type import TokenType
-from src.visitor import Visitor
-from src.token import Token
+from token_type import TokenType
+from visitor import Visitor
+from token import Token
+import Expr
 
 
 class ASTPrinter(Visitor):
