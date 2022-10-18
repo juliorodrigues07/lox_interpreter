@@ -1,14 +1,25 @@
-from token_type import *
-from token import Token
+from error_handler import ErrorHandler
+from token_type import TokenType
 from typing import List
+from token import Token
 from Expr import *
 
 
 class Parser:
 
-    def __init__(self, tokens: List[Token]):
+    class ParserError(RuntimeError):
+        pass
+
+    def __init__(self, tokens: List[Token], error_handler: ErrorHandler):
+        self.error_handler = error_handler
         self.tokens = tokens
         self.current = 0
+
+    def parse(self):
+        try:
+            return self.expression()
+        except Parser.ParserError:
+            return None
 
     def expression(self):
         return self.equality()
@@ -113,9 +124,34 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ) after expression.")
             return Grouping(expr)
 
-        return None
+        raise self.error_handler.error_parser(self.peek(), 'Expect expression.')
+
+    def error(self, token: Token, msg):
+
+        self.error_handler.error_parser(token, msg)
+        return Parser.ParserError()
 
     def consume(self, token: TokenType, msg):
 
         if self.check(token):
             return self.advance()
+
+        raise self.error(self.peek(), msg)
+
+    def synchronize(self):
+        self.advance()
+
+        while not self.is_at_end():
+
+            if self.previous().token_type == TokenType.SEMICOLON:
+                return
+            if self.peek().token_type == TokenType.CLASS or \
+               self.peek().token_type == TokenType.FUN or \
+               self.peek().token_type == TokenType.VAR or \
+               self.peek().token_type == TokenType.FOR or \
+               self.peek().token_type == TokenType.IF or \
+               self.peek().token_type == TokenType.WHILE or \
+               self.peek().token_type == TokenType.RETURN:
+                return
+
+            self.advance()
