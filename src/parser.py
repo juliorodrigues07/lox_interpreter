@@ -140,18 +140,14 @@ class Parser:
 
     def synchronize(self):
         self.advance()
+        token_types = [TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR,
+                       TokenType.IF, TokenType.WHILE, TokenType.RETURN]
 
         while not self.is_at_end():
 
             if self.previous().token_type == TokenType.SEMICOLON:
                 return
-            if self.peek().token_type == TokenType.CLASS or \
-               self.peek().token_type == TokenType.FUN or \
-               self.peek().token_type == TokenType.VAR or \
-               self.peek().token_type == TokenType.FOR or \
-               self.peek().token_type == TokenType.IF or \
-               self.peek().token_type == TokenType.WHILE or \
-               self.peek().token_type == TokenType.RETURN:
+            if self.peek().token_type in token_types:
                 return
 
             self.advance()
