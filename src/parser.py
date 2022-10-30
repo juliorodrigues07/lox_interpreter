@@ -1,7 +1,7 @@
 from error_handler import ErrorHandler
 from token_type import TokenType
 from typing import List
-from token import Token
+from src.token import Token
 from Expr import *
 
 
@@ -125,6 +125,17 @@ class Parser:
             return Grouping(expr)
 
         raise self.error_handler.error_parser(self.peek(), 'Expect expression.')
+
+    def ternary(self):
+
+        if self.match(TokenType.INTERROGACION):
+            return self.advance()
+
+        if self.match(TokenType.TWOPOINTS):
+            return self.advance()
+
+        raise self.error_handler.error_parser(self.peek(), 'Expect expression.')
+
 
     def error(self, token: Token, msg):
 

@@ -1,6 +1,6 @@
 from token_type import TokenType
 from visitor import Visitor
-from token import Token
+from src.token import Token
 import Expr
 
 

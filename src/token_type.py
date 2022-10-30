@@ -15,6 +15,8 @@ class TokenType(Enum):
     SEMICOLON = auto
     SLASH = auto
     STAR = auto
+    INTERROGACION = auto
+    TWOPOINTS = auto
 
     # 1 or 2 Char Tokens
     BANG = auto
