@@ -1,7 +1,7 @@
 from error_handler import ErrorHandler
 from token_type import TokenType
 from typing import List
-from src.token import Token
+from token import Token
 from Expr import *
 
 

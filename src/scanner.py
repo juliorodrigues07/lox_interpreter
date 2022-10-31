@@ -1,6 +1,6 @@
 from error_handler import ErrorHandler
 from token_type import *
-from src.token import Token
+from token import Token
 
 
 class Scanner:

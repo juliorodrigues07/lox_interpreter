@@ -1,4 +1,4 @@
-from src.token import Token
+from token import Token
 from token_type import TokenType
 
 
