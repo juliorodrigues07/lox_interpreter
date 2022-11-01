@@ -9,7 +9,7 @@ class Binary(Expr):
 		self.right = right
 
 	def accept(self, visitor):
-		return visitor.visit_binary_expr(self)
+		return visitor.visit_Binary_expr(self)
 
 
 class Grouping(Expr):
@@ -17,7 +17,7 @@ class Grouping(Expr):
 		self.expression = expression
 
 	def accept(self, visitor):
-		return visitor.visit_grouping_expr(self)
+		return visitor.visit_Grouping_expr(self)
 
 
 class Literal(Expr):
@@ -25,7 +25,7 @@ class Literal(Expr):
 		self.value = value
 
 	def accept(self, visitor):
-		return visitor.visit_literal_expr(self)
+		return visitor.visit_Literal_expr(self)
 
 
 class Unary(Expr):
@@ -34,4 +34,14 @@ class Unary(Expr):
 		self.right = right
 
 	def accept(self, visitor):
-		return visitor.visit_unary_expr(self)
+		return visitor.visit_Unary_expr(self)
+
+
+class Conditional(Expr):
+	def __init__(self, condition, then_jump, else_jump):
+		self.condition = condition
+		self.then_jump = then_jump
+		self.else_jump = else_jump
+
+	def accept(self, visitor):
+		return visitor.visit_Conditional_expr(self)

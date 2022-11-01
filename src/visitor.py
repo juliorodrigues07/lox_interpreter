@@ -5,17 +5,20 @@ from abc import abstractmethod
 class Visitor(ABC):
 
     @abstractmethod
-    def visit_binary_expr(self, expr):
+    def visit_Binary_expr(self, expr):
         pass
 
     @abstractmethod
-    def visit_unary_expr(self, expr):
+    def visit_Unary_expr(self, expr):
         pass
 
     @abstractmethod
-    def visit_grouping_expr(self, expr):
+    def visit_Grouping_expr(self, expr):
         pass
 
     @abstractmethod
-    def visit_literal_expr(self, expr):
+    def visit_Literal_expr(self, expr):
+        pass
+
+    def visit_Conditional_expr(self, expr):
         pass
