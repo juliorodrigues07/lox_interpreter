@@ -124,6 +124,17 @@ class Parser:
 
         self.error_handler.error_parser(self.peek(), 'Expect expression.')
 
+    def ternary(self):
+
+        if self.match(TokenType.INTERROGACION):
+            return self.advance()
+
+        if self.match(TokenType.TWOPOINTS):
+            return self.advance()
+
+        raise self.error_handler.error_parser(self.peek(), 'Expect expression.')
+
+
     def error(self, token: Token, msg):
 
         self.error_handler.error_parser(token, msg)
