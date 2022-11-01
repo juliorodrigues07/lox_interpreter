@@ -198,8 +198,8 @@ class Scanner:
 
         while not self.match(':'):
 
-            self.error_handler.error(self.line, " Expect ':' seperator after then statement in ternary operator!")
             if self.is_at_end():
+                self.error_handler.error(self.line, " Expect ':' separator after then statement in ternary operator!")
                 return
 
             self.start = self.current

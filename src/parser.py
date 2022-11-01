@@ -134,7 +134,7 @@ class Parser:
 
         if self.match(TokenType.QUESTION):
             then_branch = self.equality()
-            self.consume(TokenType.COLON, " Expect ':' seperator after then statement in ternary operator!")
+            self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
             else_branch = self.equality()
             expr = Conditional(expr, then_branch, else_branch)
 
