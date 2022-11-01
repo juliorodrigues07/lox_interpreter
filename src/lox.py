@@ -39,12 +39,12 @@ class Main:
         tokens = scanner.scan_tokens()
 
         parser = Parser(tokens, self.error_handler)
-        expression = parser.parse()
+        expressions = parser.parse()
 
         if self.error_handler.had_error:
             return
 
-        print(ASTPrinter().pprint_ast(expression))
+        print(ASTPrinter().pprint_ast(expressions))
 
     def run_lox(self):
 

@@ -6,30 +6,37 @@ import Expr
 
 class ASTPrinter(Visitor):
 
+    def __init__(self):
+        pass
+
     def pprint_ast(self, expr):
-        return self.visit(expr)
+        return expr.accept(self)
 
-    def parenthesize(self, name, *args):
-        out = ['(', name]
-        for expr in args:
-            out.append(' ')
-            out.append(expr.accept(self))
-        out.append(')')
-        return ''.join(out)
+    def parenthesize(self, name, *expressions):
 
-    def visit_BinaryExpr(self, expr):
+        builder = f"({name}"
+
+        for expr in expressions:
+            builder += f" {expr.accept(self)}"
+
+        builder += ")"
+        return builder
+
+    def visit_binary_expr(self, expr):
         return self.parenthesize(expr.operator.lexeme, expr.left, expr.right)
 
-    def visit_GroupingExpr(self, expr):
-        return self.parenthesize('group', expr.expression)
+    def visit_grouping_expr(self, expr):
+        return self.parenthesize("group", expr.expression)
 
-    def visit_LiteralExpr(self, expr):
-        if expr.value == 'nil':
-            return 'nil'
-        return str(expr.value)
-
-    def visit_UnaryExpr(self, expr):
+    def visit_unary_expr(self, expr):
         return self.parenthesize(expr.operator.lexeme, expr.right)
+
+    def visit_literal_expr(self, expr):
+
+        if expr.value is None:
+            return "nil"
+
+        return str(expr.value)
 
 
 if __name__ == '__main__':

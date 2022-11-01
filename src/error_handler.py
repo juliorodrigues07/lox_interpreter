@@ -2,6 +2,11 @@ from token import Token
 from token_type import TokenType
 
 
+class ParseError(RuntimeError):
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class ErrorHandler:
 
     def __init__(self):
@@ -15,7 +20,7 @@ class ErrorHandler:
         if token.token_type == TokenType.EOF:
             self.report(token.line, ' at end', msg)
         else:
-            self.report(token.line, ' at ', + token.lexeme + ' ' + msg)
+            self.report(token.line, " at '" + token.lexeme + "'", msg)
 
     def report(self, line, where, message):
 

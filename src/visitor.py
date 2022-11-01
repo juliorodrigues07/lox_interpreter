@@ -1,15 +1,21 @@
-class Visitor:
-    def visit(self, expr_or_stmt):
-        return expr_or_stmt.accept(self)
+from abc import ABC
+from abc import abstractmethod
 
-    def visit_AssignExpr(self, expr_or_stmt):
-        return expr_or_stmt.accept(self)
 
-    def visit_BinaryExpr(self, expr_or_stmt):
-        return expr_or_stmt.accept(self)
+class Visitor(ABC):
 
-    def visit_GroupingExpr(self, expr_or_stmt):
-        return expr_or_stmt.accept(self)
+    @abstractmethod
+    def visit_binary_expr(self, expr):
+        pass
 
-    def visit_LiteralExpr(self, expr_or_stmt):
-        return expr_or_stmt.accept(self)
+    @abstractmethod
+    def visit_unary_expr(self, expr):
+        pass
+
+    @abstractmethod
+    def visit_grouping_expr(self, expr):
+        pass
+
+    @abstractmethod
+    def visit_literal_expr(self, expr):
+        pass

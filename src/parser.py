@@ -1,14 +1,12 @@
 from error_handler import ErrorHandler
+from error_handler import ParseError
 from token_type import TokenType
-from typing import List
 from token import Token
+from typing import List
 from Expr import *
 
 
 class Parser:
-
-    class ParserError(RuntimeError):
-        pass
 
     def __init__(self, tokens: List[Token], error_handler: ErrorHandler):
         self.error_handler = error_handler
@@ -18,26 +16,13 @@ class Parser:
     def parse(self):
         try:
             return self.expression()
-        except Parser.ParserError:
+        except ParseError as error:
             return None
-
-    def expression(self):
-        return self.equality()
-
-    def equality(self):
-        expr = self.comparison()
-
-        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
-            operator = self.previous()
-            right = self.comparison()
-            expr = Binary(expr, operator, right)
-
-        return expr
 
     def match(self, *token_types):
 
-        for token in token_types:
-            if self.check(token):
+        for token_ in token_types:
+            if self.check(token_):
                 self.advance()
                 return True
 
@@ -65,6 +50,19 @@ class Parser:
 
     def peek(self):
         return self.tokens[self.current]
+
+    def expression(self):
+        return self.equality()
+
+    def equality(self):
+        expr = self.comparison()
+
+        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            operator = self.previous()
+            right = self.comparison()
+            expr = Binary(expr, operator, right)
+
+        return expr
 
     def comparison(self):
         expr = self.term()
@@ -124,21 +122,22 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ) after expression.")
             return Grouping(expr)
 
-        raise self.error_handler.error_parser(self.peek(), 'Expect expression.')
+        self.error_handler.error_parser(self.peek(), 'Expect expression.')
 
     def error(self, token: Token, msg):
 
         self.error_handler.error_parser(token, msg)
-        return Parser.ParserError()
+        return ParseError("")
 
-    def consume(self, token: TokenType, msg):
+    def consume(self, token_: TokenType, msg):
 
-        if self.check(token):
+        if self.check(token_):
             return self.advance()
 
-        raise self.error(self.peek(), msg)
+        self.error(self.peek(), msg)
 
     def synchronize(self):
+
         self.advance()
         token_types = [TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR,
                        TokenType.IF, TokenType.WHILE, TokenType.RETURN]
