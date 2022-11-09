@@ -20,5 +20,6 @@ class Visitor(ABC):
     def visit_Literal_expr(self, expr):
         pass
 
+    @abstractmethod
     def visit_Conditional_expr(self, expr):
         pass

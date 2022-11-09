@@ -54,6 +54,17 @@ class Parser:
     def expression(self):
         return self.equality()
 
+    def ternary(self):
+        expr = self.equality()
+
+        if self.match(TokenType.QUESTION):
+            then_branch = self.equality()
+            self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
+            else_branch = self.equality()
+            expr = Conditional(expr, then_branch, else_branch)
+
+        return expr
+
     def equality(self):
         expr = self.comparison()
 
@@ -128,17 +139,6 @@ class Parser:
             return None
 
         self.error_handler.error_parser(self.peek(), 'Expect expression.')
-
-    def ternary(self):
-        expr = self.equality()
-
-        if self.match(TokenType.QUESTION):
-            then_branch = self.equality()
-            self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
-            else_branch = self.equality()
-            expr = Conditional(expr, then_branch, else_branch)
-
-        return expr
 
     def error(self, token: Token, msg):
 
