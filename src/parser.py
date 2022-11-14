@@ -16,7 +16,7 @@ class Parser:
     def parse(self):
         try:
             return self.expression()
-        except ParseError as error:
+        except ParseError:
             return None
 
     def match(self, *token_types):
@@ -138,11 +138,11 @@ class Parser:
             self.ternary()
             return None
 
-        self.error_handler.error_parser(self.peek(), 'Expect expression.')
+        self.error_handler.parser_error(self.peek(), 'Expect expression.')
 
     def error(self, token: Token, msg):
 
-        self.error_handler.error_parser(token, msg)
+        self.error_handler.parser_error(token, msg)
         return ParseError("")
 
     def consume(self, token_: TokenType, msg):

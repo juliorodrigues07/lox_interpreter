@@ -1,17 +1,16 @@
 from error_handler import ErrorHandler
+from interpreter import Interpreter
 from astPrinter import ASTPrinter
 from scanner import Scanner
 from parser import Parser
-from interpreter import Interpreter
 import sys
 
 
 class Main:
 
     def __init__(self):
-        self.hadRuntomeError = False
-        self.interpreter = Interpreter(self)
         self.error_handler = ErrorHandler()
+        self.interpreter = Interpreter(self.error_handler)
 
     def run_file(self, file_name):
 
@@ -22,7 +21,7 @@ class Main:
 
         if self.error_handler.had_error:
             sys.exit(65)
-        if self.hadRuntomeError:
+        if self.error_handler.had_runtime_error:
             sys.exit(70)
 
     def run_prompt(self):
@@ -50,6 +49,7 @@ class Main:
             return
 
         self.interpreter.interpret(expressions)
+        # print(ASTPrinter().pprint_ast(expressions))
 
     def run_lox(self):
 
@@ -60,10 +60,6 @@ class Main:
             self.run_file(sys.argv[1])
         else:
             self.run_prompt()
-
-    def runtime_error(self, error):
-        print(f'[Line {error.token.line}] {error}')
-        self.hadRuntomeError = True
 
 
 if __name__ == '__main__':
