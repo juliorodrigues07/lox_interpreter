@@ -1,9 +1,13 @@
+from visitor import Visitor
+from error_handler import *
 from token_type import *
 from Expr import *
-from visitor import Visitor
 
 
-class Interpreter(Expr, Visitor):
+class Interpreter(Visitor):
+
+    def __init__(self, error_handler: ErrorHandler):
+        self.error_handler = error_handler
 
     @staticmethod
     def is_truthy(expr):
@@ -25,8 +29,47 @@ class Interpreter(Expr, Visitor):
 
         return left == right
 
+    @staticmethod
+    def check_number_operand(operator, operand):
+
+        if type(operand) is float:
+            return
+
+        raise LoxRunTimeError(operator, 'Operand must be a number!')
+
+    @staticmethod
+    def check_number_operands(operator, left, right):
+
+        if type(left) is float and type(right) is float:
+            return
+
+        raise LoxRunTimeError(operator, 'Operands must be numbers!')
+
     def evaluate(self, expr: Expr):
         return expr.accept(self)
+
+    def interpret(self, expression: Expr):
+
+        try:
+            element = self.evaluate(expression)
+            print(self.stringfy(element))
+        except LoxRunTimeError as error:
+            self.error_handler.interpreter_error(error)
+
+    def stringfy(self, element):
+
+        if element is None:
+            return 'nil'
+
+        if type(element) is float:
+            text = str(element)
+
+            if text.endswith('.0'):
+                text = text[:len(text) - 2]
+
+            return text
+
+        return str(element)
 
     def visit_Literal_expr(self, expr: Literal):
         return expr.value
@@ -39,6 +82,7 @@ class Interpreter(Expr, Visitor):
         right = self.evaluate(expr.right)
 
         if expr.operator.token_type == TokenType.MINUS:
+            self.check_number_operand(expr.operator, right)
             return -float(right)
         if expr.operator.token_type == TokenType.BANG:
             return not self.is_truthy(right)
@@ -51,23 +95,31 @@ class Interpreter(Expr, Visitor):
         right = self.evaluate(expr.right)
 
         if expr.operator.token_type == TokenType.MINUS:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) - float(right)
         elif expr.operator.token_type == TokenType.SLASH:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) / float(right)
         elif expr.operator.token_type == TokenType.STAR:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) * float(right)
         elif expr.operator.token_type == TokenType.PLUS:
             if type(left) is float and type(right) is float:
                 return float(left) + float(right)
             if type(left) is str and type(right) is str:
                 return str(left) + str(right)
+            raise LoxRunTimeError(expr.operator, 'Operands must be two numbers or two strings!')
         elif expr.operator.token_type == TokenType.GREATER:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) > float(right)
         elif expr.operator.token_type == TokenType.GREATER_EQUAL:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) >= float(right)
         elif expr.operator.token_type == TokenType.LESS:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) < float(right)
         elif expr.operator.token_type == TokenType.LESS_EQUAL:
+            self.check_number_operands(expr.operator, left, right)
             return float(left) <= float(right)
         elif expr.operator.token_type == TokenType.BANG_EQUAL:
             return not self.is_equal(left, right)
