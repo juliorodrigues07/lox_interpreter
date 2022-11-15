@@ -134,7 +134,7 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ) after expression.")
             return Grouping(expr)
 
-        self.error_handler.error_parser(self.peek(), 'Expect expression.')
+        self.error_handler.parser_error(self.peek(), 'Expect expression.')
 
     def error(self, token: Token, msg):
 
