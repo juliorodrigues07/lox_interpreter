@@ -1,53 +1,6 @@
-from enum import Enum, auto
+from enum import Enum
 
-
-class TokenType(Enum):
-
-    # 1 Char Token
-    LEFT_PAREN = auto
-    RIGHT_PAREN = auto
-    LEFT_BRACE = auto
-    RIGHT_BRACE = auto
-    COMMA = auto
-    DOT = auto
-    MINUS = auto
-    PLUS = auto
-    SEMICOLON = auto
-    SLASH = auto
-    STAR = auto
-
-    # 1 or 2 Char Tokens
-    BANG = auto
-    BANG_EQUAL = auto
-    EQUAL = auto
-    EQUAL_EQUAL = auto
-    GREATER = auto
-    GREATER_EQUAL = auto
-    LESS = auto
-    LESS_EQUAL = auto
-
-    # Literals
-    IDENTIFIER = auto
-    STRING = auto
-    NUMBER = auto
-
-    # Keywords
-    AND = auto
-    CLASS = auto
-    ELSE = auto
-    FALSE = auto
-    FUN = auto
-    FOR = auto
-    IF = auto
-    NIL = auto
-    OR = auto
-    PRINT = auto
-    RETURN = auto
-    SUPER = auto
-    THIS = auto
-    TRUE = auto
-    VAR = auto
-    WHILE = auto
-
-    # End of File
-    EOF = auto
+TokenType = Enum("TokenType",
+                 "LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE COMMA DOT MINUS PLUS SEMICOLON SLASH STAR QUESTION COLON \
+                  BANG BANG_EQUAL EQUAL EQUAL_EQUAL GREATER GREATER_EQUAL LESS LESS_EQUAL IDENTIFIER STRING NUMBER \
+                  AND CLASS ELSE FALSE FUN FOR IF NIL OR PRINT RETURN SUPER THIS TRUE VAR WHILE BREAK EOF")

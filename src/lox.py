@@ -1,5 +1,8 @@
 from error_handler import ErrorHandler
+from interpreter import Interpreter
+from astPrinter import ASTPrinter
 from scanner import Scanner
+from parser import Parser
 import sys
 
 
@@ -7,6 +10,7 @@ class Main:
 
     def __init__(self):
         self.error_handler = ErrorHandler()
+        self.interpreter = Interpreter(self.error_handler)
 
     def run_file(self, file_name):
 
@@ -17,6 +21,8 @@ class Main:
 
         if self.error_handler.had_error:
             sys.exit(65)
+        if self.error_handler.had_runtime_error:
+            sys.exit(70)
 
     def run_prompt(self):
 
@@ -36,8 +42,14 @@ class Main:
         scanner = Scanner(self.error_handler, source)
         tokens = scanner.scan_tokens()
 
+        parser = Parser(tokens, self.error_handler)
+        expressions = parser.parse()
+
         if self.error_handler.had_error:
             return
+
+        self.interpreter.interpret(expressions)
+        # print(ASTPrinter().pprint_ast(expressions))
 
     def run_lox(self):
 

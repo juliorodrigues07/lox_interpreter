@@ -81,6 +81,10 @@ class Scanner:
                 self.skip()
             else:
                 self.add_token(TokenType.SLASH)
+        elif char == '?':
+            self.add_token(TokenType.QUESTION)
+        elif char == ':':
+            self.add_token(TokenType.COLON)
         elif char == ' ' or char == '\r' or char == '\t':
             pass
         elif char == '\n':
@@ -176,6 +180,21 @@ class Scanner:
                 self.line += 1
 
             self.advance()
+
+    # def ternary(self):
+
+    #     while not self.match(':'):
+
+    #         if self.is_at_end():
+    #             self.error_handler.error(self.line, " Expect ':' separator after then statement in ternary operator!")
+    #             return
+
+    #         self.start = self.current
+    #         self.scan_token()
+
+    #     self.current -= 1
+    #     self.add_token(TokenType.COLON)
+    #     self.advance()
 
     def number(self):
 

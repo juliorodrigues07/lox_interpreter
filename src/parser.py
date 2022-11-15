@@ -1,4 +1,6 @@
-from token_type import *
+from error_handler import ErrorHandler
+from error_handler import ParseError
+from token_type import TokenType
 from token import Token
 from typing import List
 from Expr import *
@@ -6,27 +8,21 @@ from Expr import *
 
 class Parser:
 
-    def __init__(self, tokens: List[Token]):
+    def __init__(self, tokens: List[Token], error_handler: ErrorHandler):
+        self.error_handler = error_handler
         self.tokens = tokens
         self.current = 0
 
-    def expression(self):
-        return self.equality()
-
-    def equality(self):
-        expr = self.comparison()
-
-        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
-            operator = self.previous()
-            right = self.comparison()
-            expr = Binary(expr, operator, right)
-
-        return expr
+    def parse(self):
+        try:
+            return self.expression()
+        except ParseError:
+            return None
 
     def match(self, *token_types):
 
-        for token in token_types:
-            if self.check(token):
+        for token_ in token_types:
+            if self.check(token_):
                 self.advance()
                 return True
 
@@ -54,6 +50,31 @@ class Parser:
 
     def peek(self):
         return self.tokens[self.current]
+
+    def expression(self):
+        return self.equality()
+
+    def ternary(self):
+        expr = self.equality()
+
+        if self.match(TokenType.QUESTION):
+            left_operator = self.previous()
+            then_branch = self.expression()
+            right_operator = self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
+            else_branch = self.equality()
+            expr = Conditional(expr, then_branch, else_branch)
+
+        return expr
+
+    def equality(self):
+        expr = self.comparison()
+
+        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            operator = self.previous()
+            right = self.comparison()
+            expr = Binary(expr, operator, right)
+
+        return expr
 
     def comparison(self):
         expr = self.term()
@@ -113,9 +134,31 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ) after expression.")
             return Grouping(expr)
 
-        return None
+        self.error_handler.parser_error(self.peek(), 'Expect expression.')
 
-    def consume(self, token: TokenType, msg):
+    def error(self, token: Token, msg):
 
-        if self.check(token):
+        self.error_handler.parser_error(token, msg)
+        return ParseError("")
+
+    def consume(self, token_: TokenType, msg):
+
+        if self.check(token_):
             return self.advance()
+
+        self.error(self.peek(), msg)
+
+    def synchronize(self):
+
+        self.advance()
+        token_types = [TokenType.CLASS, TokenType.FUN, TokenType.VAR, TokenType.FOR,
+                       TokenType.IF, TokenType.WHILE, TokenType.RETURN]
+
+        while not self.is_at_end():
+
+            if self.previous().token_type == TokenType.SEMICOLON:
+                return
+            if self.peek().token_type in token_types:
+                return
+
+            self.advance()
