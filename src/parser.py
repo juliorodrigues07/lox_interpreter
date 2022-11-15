@@ -16,7 +16,7 @@ class Parser:
     def parse(self):
         try:
             return self.expression()
-        except ParseError as error:
+        except ParseError:
             return None
 
     def match(self, *token_types):
@@ -53,6 +53,18 @@ class Parser:
 
     def expression(self):
         return self.equality()
+
+    def ternary(self):
+        expr = self.equality()
+
+        if self.match(TokenType.QUESTION):
+            left_operator = self.previous()
+            then_branch = self.expression()
+            right_operator = self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
+            else_branch = self.equality()
+            expr = Conditional(expr, then_branch, else_branch)
+
+        return expr
 
     def equality(self):
         expr = self.comparison()
@@ -122,23 +134,7 @@ class Parser:
             self.consume(TokenType.RIGHT_PAREN, "Expect ) after expression.")
             return Grouping(expr)
 
-        if self.match(TokenType.QUESTION):
-            self.error(self.previous(), "Missing condition expression for ternary conditional.")
-            self.ternary()
-            return None
-
         self.error_handler.error_parser(self.peek(), 'Expect expression.')
-
-    def ternary(self):
-        expr = self.equality()
-
-        if self.match(TokenType.QUESTION):
-            then_branch = self.equality()
-            self.consume(TokenType.COLON, " Expect ':' separator after then statement in ternary operator!")
-            else_branch = self.equality()
-            expr = Conditional(expr, then_branch, else_branch)
-
-        return expr
 
     def error(self, token: Token, msg):
 
