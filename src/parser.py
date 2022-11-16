@@ -52,7 +52,7 @@ class Parser:
         return self.tokens[self.current]
 
     def expression(self):
-        return self.equality()
+        return self.ternary()
 
     def ternary(self):
         expr = self.equality()
