@@ -129,4 +129,12 @@ class Interpreter(Visitor):
         return None
 
     def visit_Conditional_expr(self, expr: Conditional):
-        pass
+
+        condition = self.evaluate(expr.condition)
+        then_jump = self.evaluate(expr.then_jump)
+        else_jump = self.evaluate(expr.else_jump)
+
+        if self.is_truthy(condition):
+            return then_jump
+
+        return else_jump
