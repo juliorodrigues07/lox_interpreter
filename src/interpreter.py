@@ -106,9 +106,15 @@ class Interpreter(Visitor):
         elif expr.operator.token_type == TokenType.PLUS:
             if type(left) is float and type(right) is float:
                 return float(left) + float(right)
-            if type(left) is str and type(right) is str:
+
+            # Se um dos dois operandos é uma string, o segundo automaticamente é convertido em string para concatenação
+            if type(left) is str or type(right) is str:
                 return str(left) + str(right)
-            raise LoxRunTimeError(expr.operator, 'Operands must be two numbers or two strings!')
+
+            # if (type(left) is str and type(right) is float) or (type(left) is float and type(right) is str):
+            #     return str(left) + str(right)
+
+            raise LoxRunTimeError(expr.operator, 'The two operands must be numbers or one of them must be string! (coercion)')
         elif expr.operator.token_type == TokenType.GREATER:
             self.check_number_operands(expr.operator, left, right)
             return float(left) > float(right)
