@@ -45,18 +45,8 @@ class Interpreter(Visitor):
 
         raise LoxRunTimeError(operator, 'Operands must be numbers!')
 
-    def evaluate(self, expr: Expr):
-        return expr.accept(self)
-
-    def interpret(self, expression: Expr):
-
-        try:
-            element = self.evaluate(expression)
-            print(self.stringfy(element))
-        except LoxRunTimeError as error:
-            self.error_handler.interpreter_error(error)
-
-    def stringfy(self, element):
+    @staticmethod
+    def stringfy(element):
 
         if element is None:
             return 'nil'
@@ -70,6 +60,17 @@ class Interpreter(Visitor):
             return text
 
         return str(element)
+
+    def evaluate(self, expr: Expr):
+        return expr.accept(self)
+
+    def interpret(self, expression: Expr):
+
+        try:
+            element = self.evaluate(expression)
+            print(self.stringfy(element))
+        except LoxRunTimeError as error:
+            self.error_handler.interpreter_error(error)
 
     def visit_Literal_expr(self, expr: Literal):
         return expr.value
