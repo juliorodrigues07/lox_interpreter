@@ -110,9 +110,19 @@ class Interpreter(Visitor):
             # Se um dos dois operandos é uma string, o segundo automaticamente é convertido em string para concatenação
             if type(left) is str or type(right) is str:
                 if type(left) is not bool and type(right) is not bool:
+
                     '''
                     Se o outro operando é inteiro, este é convertido primeiro (float -> int), para então concatenar
-                    Exemplo: "test" + 1.00 = "test1.00"
+                    Exemplo: "test" + 1.00 = "test1"
+                    '''
+                    if isinstance(left, float) and left.is_integer():
+                        left = int(left)
+                    if isinstance(right, float) and right.is_integer():
+                        right = int(right)
+                    '''
+                    Como o valor é convertido para float antes da avaliação, não é possível concatenações do tipo: "test" + 2.000 = "test2.000"
+                    "test" + 2.000 e "test" + 2 são tratadas como equivalentes e resultam em "test2"
+                    Não há como saber se o valor de entrada foi 2 ou 2.000 neste ponto do código
                     '''
                     return str(left) + str(right)
 
